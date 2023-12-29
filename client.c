@@ -28,4 +28,7 @@ int main(){
         Sleep(5);
         
     };
+    closesocket(sock);
+    WSACleanup();
+    exit(0);
 }
