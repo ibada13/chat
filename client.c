@@ -12,18 +12,32 @@
 #define letzero(s) (void)memset(s, 0, sizeof(s));
 
 int sock;
+char name[1024];
+char messa[1024];
 DWORD WINAPI  spcwrite(LPVOID thread){
-    char buffer[1024];
+while (1)
+{
+        char buffer[1024];
     letzero(buffer);
+    letzero(messa);
+    printf("%s : ", name);
     fgets(buffer, sizeof(buffer), stdin);
-    send(sock, buffer, sizeof(buffer), 0);
+    sprintf(messa, "%s : %s", name, buffer);
+    strtok(messa, "\n");
+    printf("%s\n", messa);
+    send(sock, messa, sizeof(messa), 0);
+}
+
 }
 DWORD WINAPI  spcread(LPVOID thread){
-    char mes[1024];
+    while(1){
+        char mes[1024];
     letzero(mes);
     recv(sock, mes, sizeof(mes), 0);
     printf("%s\n", mes);
+    }
 }
+
 int main(){
      
     
@@ -48,7 +62,16 @@ int main(){
         Sleep(5);
         
     };
- HANDLE theardsHa[2];
+    char first[1024];
+    printf("you have to enter your name : ");
+    fgets(name, sizeof(name), stdin);
+    strtok(name, "\n");
+    // letzero()
+    sprintf(first, "%s has enter the char", name);
+    strtok(first, "\n");
+    send(sock, first, sizeof(first), 0);
+
+    HANDLE theardsHa[2];
 
     theardsHa[0] = CreateThread(NULL, 0, spcwrite, NULL, 0, NULL);
     theardsHa[1] = CreateThread(NULL, 0, spcread, NULL, 0, NULL);

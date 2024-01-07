@@ -11,17 +11,27 @@
 #include <sys/types.h>
 #define letzero(s) (void)memset(s, 0, sizeof(s));
 int client_socket ;
+char messa[1024];
 DWORD WINAPI  spcwrite(LPVOID thrd){
-    char buffer[1024];
+while (1)
+{
+        char buffer[1024];
     letzero(buffer);
+    printf("admin : " );
     fgets(buffer, sizeof(buffer), stdin);
-    send(client_socket, buffer, sizeof(buffer), 0);
+    sprintf(messa, "admin : %s", buffer);
+    strtok(messa, "\n");
+     printf("%s\n", messa);
+    send(client_socket, messa, sizeof(messa), 0);
+}
 }
 DWORD WINAPI spcread(LPVOID thrd){
-    char mes[1024];
+    while(1){
+        char mes[1024];
     letzero(mes);
     recv(client_socket, mes, sizeof(mes), 0);
     printf("%s\n", mes);
+    }
 }
 int main(){
  WSADATA wsaData; // Windows socket initialization data
@@ -32,9 +42,8 @@ int main(){
     }
 
     int sock;
-    char order[1024];
-    char response[18384];
-  
+    char buffer[1024];
+
     struct sockaddr_in server_address, client_address;
    
     int opval = 1;
@@ -66,8 +75,11 @@ int main(){
 
     client_length = sizeof(client_address);
     client_socket = accept(sock, (struct sockaddr *)&client_address, &client_length);
-    printf("[+] connect established from %s\n", inet_ntoa(client_address.sin_addr));
-
+    // printf("[+] connect established from %s\n", inet_ntoa(client_address.sin_addr));
+    memset(buffer, 0, 1024);
+    // letzero(buffer);
+    recv(sock, buffer, sizeof(buffer), 0);
+    printf("%s\n", buffer);
     HANDLE theardsHa[2];
 
     theardsHa[0] = CreateThread(NULL, 0, spcwrite, NULL, 0, NULL);
