@@ -1,12 +1,32 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<windows.h>
-#include<stdbool.h>
-#include<winsock.h>
-#include<wininet.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <winsock2.h>
+#include <windows.h>
+#include <winuser.h>
+#include <wininet.h>
+#include <windowsx.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#define letzero(s) (void)memset(s, 0, sizeof(s));
 
+int sock;
+DWORD WINAPI  spcwrite(LPVOID thread){
+    char buffer[1024];
+    letzero(buffer);
+    fgets(buffer, sizeof(buffer), stdin);
+    send(sock, buffer, sizeof(buffer), 0);
+}
+DWORD WINAPI  spcread(LPVOID thread){
+    char mes[1024];
+    letzero(mes);
+    recv(sock, mes, sizeof(mes), 0);
+    printf("%s\n", mes);
+}
 int main(){
-    int sock;
+     
+    
     struct sockaddr_in ServAddr;
     unsigned short ServPort;
     char *ServIP;
@@ -23,11 +43,21 @@ int main(){
     ServAddr.sin_family = AF_INET;
     ServAddr.sin_addr.s_addr = inet_addr(ServIP);
     ServAddr.sin_port = htons(ServPort);
-    while (connect(sock, &ServAddr, sizeof(ServAddr)) != 0)
+    while (connect(sock,(struct sockaddr*)&ServAddr, sizeof(ServAddr)) != 0)
     {
         Sleep(5);
         
     };
+ HANDLE theardsHa[2];
+
+    theardsHa[0] = CreateThread(NULL, 0, spcwrite, NULL, 0, NULL);
+    theardsHa[1] = CreateThread(NULL, 0, spcread, NULL, 0, NULL);
+
+    if (theardsHa[0] == NULL || theardsHa[1] == NULL)
+    {
+        fprintf(stderr, "404 err hapend ... \n");
+    }
+    WaitForMultipleObjects(2, theardsHa, TRUE, INFINITE);
     closesocket(sock);
     WSACleanup();
     exit(0);

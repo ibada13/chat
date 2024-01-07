@@ -1,0 +1,1 @@
+#define letzero(s) (void)memset(s, 0, sizeof(s));

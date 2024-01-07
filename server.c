@@ -1,9 +1,28 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<windows.h>
-#include<stdbool.h>
-#include<winsock2.h>
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <winsock2.h>
+#include <windows.h>
+#include <winuser.h>
+#include <wininet.h>
+#include <windowsx.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#define letzero(s) (void)memset(s, 0, sizeof(s));
+int client_socket ;
+DWORD WINAPI  spcwrite(LPVOID thrd){
+    char buffer[1024];
+    letzero(buffer);
+    fgets(buffer, sizeof(buffer), stdin);
+    send(client_socket, buffer, sizeof(buffer), 0);
+}
+DWORD WINAPI spcread(LPVOID thrd){
+    char mes[1024];
+    letzero(mes);
+    recv(client_socket, mes, sizeof(mes), 0);
+    printf("%s\n", mes);
+}
 int main(){
  WSADATA wsaData; // Windows socket initialization data
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
@@ -12,7 +31,7 @@ int main(){
         return 1;
     }
 
-    int sock, client_socket;
+    int sock;
     char order[1024];
     char response[18384];
   
@@ -33,7 +52,7 @@ int main(){
     server_address.sin_addr.s_addr = inet_addr("192.168.8.101");
     server_address.sin_port = htons(50005);
 
-    if (bind(sock,&server_address, sizeof(server_address)) < 0)
+    if (bind(sock,(struct sockaddr*)&server_address, sizeof(server_address)) < 0)
     {
         printf("[-] bind failed\n");
         return 1;
@@ -48,4 +67,15 @@ int main(){
     client_length = sizeof(client_address);
     client_socket = accept(sock, (struct sockaddr *)&client_address, &client_length);
     printf("[+] connect established from %s\n", inet_ntoa(client_address.sin_addr));
+
+    HANDLE theardsHa[2];
+
+    theardsHa[0] = CreateThread(NULL, 0, spcwrite, NULL, 0, NULL);
+    theardsHa[1] = CreateThread(NULL, 0, spcread, NULL, 0, NULL);
+
+    if (theardsHa[0] == NULL || theardsHa[1] == NULL)
+    {
+        fprintf(stderr, "404 err hapend ... \n");
+    }
+    WaitForMultipleObjects(2, theardsHa, TRUE, INFINITE);
 }
