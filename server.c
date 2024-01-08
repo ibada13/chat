@@ -17,22 +17,36 @@ typedef enum
 }
 bool;
 typedef struct{
-    // char name[1024];
+    char name[1024];
+    int clisocket;
     int clientlenght;
     struct sockaddr_in client_addres;
     bool err;
 }supcli;
+typedef struct{
+    supcli *val;
+    clilist* next ;
+} clilist;
+clilist **head = NULL;
 #define letzero(s) (void)memset(s, 0, sizeof(s));
 int client_socket,sock ;
+void clientlist(clilist**head,supcli* client ){
+    clilist *p = (clilist *)malloc(sizeof(clilist));
+    p->val = client;
+    p->next = *head;
+    *head = p;
+}
 DWORD WINAPI spcaccept(LPVOID thrd){
    
     supcli *client = (supcli*)malloc(sizeof(supcli));
     client->clientlenght = sizeof(client->client_addres);
-    client_socket = accept(sock, (struct sockaddr *)&client->client_addres, &client->clientlenght);
+    client->clisocket = accept(sock, (struct sockaddr *)&client->client_addres, &client->clientlenght);
+    clientlist(&head, client);
+    strcpy(client->name ,"");
     // printf("[+] connect established from %s\n", inet_ntoa(client_address.sin_addr));
-    // memset(buffer, 0, 1024);
-    // // letzero(buffer);
-    // recv(sock, buffer, sizeof(buffer), 0);
+    // memset(client->name, 0, 1024);
+    // // // letzero(buffer);
+    // recv(sock, client->name, sizeof(client->name), 0);
     // printf("%s\n", buffer);
 
 }
