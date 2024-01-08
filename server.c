@@ -9,13 +9,38 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+typedef enum
+{
+
+    false,
+    true
+}
+bool;
+typedef struct{
+    // char name[1024];
+    int clientlenght;
+    struct sockaddr_in client_addres;
+    bool err;
+}supcli;
 #define letzero(s) (void)memset(s, 0, sizeof(s));
-int client_socket ;
-char messa[1024];
+int client_socket,sock ;
+DWORD WINAPI spcaccept(LPVOID thrd){
+   
+    supcli *client = (supcli*)malloc(sizeof(supcli));
+    client->clientlenght = sizeof(client->client_addres);
+    client_socket = accept(sock, (struct sockaddr *)&client->client_addres, &client->clientlenght);
+    // printf("[+] connect established from %s\n", inet_ntoa(client_address.sin_addr));
+    // memset(buffer, 0, 1024);
+    // // letzero(buffer);
+    // recv(sock, buffer, sizeof(buffer), 0);
+    // printf("%s\n", buffer);
+
+}
 DWORD WINAPI  spcwrite(LPVOID thrd){
 while (1)
 {
-        char buffer[1024];
+    char messa[1024];
+    char buffer[1024];
     letzero(buffer);
     printf("admin : " );
     fgets(buffer, sizeof(buffer), stdin);
@@ -42,7 +67,7 @@ int main(){
         return 1;
     }
 
-    int sock;
+
     char buffer[1024];
 
     struct sockaddr_in server_address, client_address;
@@ -74,13 +99,7 @@ int main(){
         return 1;
     }
 
-    client_length = sizeof(client_address);
-    client_socket = accept(sock, (struct sockaddr *)&client_address, &client_length);
-    // printf("[+] connect established from %s\n", inet_ntoa(client_address.sin_addr));
-    memset(buffer, 0, 1024);
-    // letzero(buffer);
-    recv(sock, buffer, sizeof(buffer), 0);
-    printf("%s\n", buffer);
+
     HANDLE theardsHa[2];
 
     theardsHa[0] = CreateThread(NULL, 0, spcwrite, NULL, 0, NULL);
