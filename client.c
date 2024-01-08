@@ -35,7 +35,7 @@ DWORD WINAPI  spcread(LPVOID thread){
     letzero(mes);
     recv(sock, mes, sizeof(mes), 0);
     printf("\r%s\n", mes);
-    printf("%s", name);
+    printf("%s : ",name);
     }
 }
 
