@@ -33,7 +33,7 @@ int client_socket,sock ;
 void clientlist(clilist**thead,supcli* client ){
     clilist *p = (clilist *)malloc(sizeof(clilist));
     p->val = client;
-    p->next = (clilist*)*thead;
+    p->next = (struct clilist*)*thead;
     *thead = p;
 }
 void resend(int clisocket,char* buffer){
