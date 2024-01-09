@@ -25,19 +25,38 @@ typedef struct{
 }supcli;
 typedef struct{
     supcli *val;
-    clilist* next ;
+    struct clilist* next ;
 } clilist;
-clilist **head = NULL;
+clilist *head = NULL;
 #define letzero(s) (void)memset(s, 0, sizeof(s));
 int client_socket,sock ;
-void clientlist(clilist**head,supcli* client ){
+void clientlist(clilist**thead,supcli* client ){
     clilist *p = (clilist *)malloc(sizeof(clilist));
     p->val = client;
-    p->next = *head;
-    *head = p;
+    p->next = (clilist*)*thead;
+    *thead = p;
+}
+void resend(int clisocket,char* buffer){
+    clilist *p = head;
+    while(p!=NULL){
+        if(p->val->clisocket != clisocket){
+            send(p->val->clisocket, buffer, sizeof(buffer), 0);
+        }
+    }
+}
+DWORD WINAPI spcread(LPVOID thrd){
+    int client_socket = *((int *)thrd);
+    while(1){
+    char mes[1024];
+    letzero(mes);
+    recv(client_socket, mes, sizeof(mes), 0);
+    resend(client_socket, mes);
+    printf("\r%s\n", mes);
+    printf("admin : ");
+    }
 }
 DWORD WINAPI spcaccept(LPVOID thrd){
-   
+   while(true){
     supcli *client = (supcli*)malloc(sizeof(supcli));
     client->clientlenght = sizeof(client->client_addres);
     client->clisocket = accept(sock, (struct sockaddr *)&client->client_addres, &client->clientlenght);
@@ -49,7 +68,9 @@ DWORD WINAPI spcaccept(LPVOID thrd){
     // // // letzero(buffer);
     // recv(sock, client->name, sizeof(client->name), 0);
     // printf("%s\n", buffer);
-
+    HANDLE threade;
+    threade = CreateThread(NULL, 0, spcread, (LPVOID*)&client->clisocket, 0, NULL);
+    WaitForMultipleObjects(1, threade, TRUE, INFINITE);}
 }
 DWORD WINAPI  spcwrite(LPVOID thrd){
 while (1)
@@ -61,19 +82,11 @@ while (1)
     fgets(buffer, sizeof(buffer), stdin);
     sprintf(messa, "admin : %s", buffer);
     strtok(messa, "\n");
-     printf("%s\n", messa);
+    //  printf("%s\n", messa);
     send(client_socket, messa, sizeof(messa), 0);
 }
 }
-DWORD WINAPI spcread(LPVOID thrd){
-    while(1){
-        char mes[1024];
-    letzero(mes);
-    recv(client_socket, mes, sizeof(mes), 0);
-    printf("\r%s\n", mes);
-    printf("admin : ");
-    }
-}
+
 int main(){
  WSADATA wsaData; // Windows socket initialization data
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
@@ -117,8 +130,8 @@ int main(){
 
     HANDLE theardsHa[2];
 
-    theardsHa[0] = CreateThread(NULL, NULL, spcwrite, NULL, 0, NULL);
-    theardsHa[1] = CreateThread(NULL, 0, spcread, NULL, 0, NULL);
+    theardsHa[0] = CreateThread(NULL, 0, spcaccept, NULL, 0, NULL);
+    theardsHa[1] = CreateThread(NULL, 0, spcwrite, NULL, 0, NULL);
 
     if (theardsHa[0] == NULL || theardsHa[1] == NULL)
     {
