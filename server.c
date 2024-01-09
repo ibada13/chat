@@ -23,7 +23,7 @@ typedef struct{
     struct sockaddr_in client_addres;
     bool err;
 }supcli;
-typedef struct{
+typedef struct clilist{
     supcli *val;
     struct clilist* next ;
 } clilist;
@@ -32,8 +32,12 @@ clilist *head = NULL;
 int client_socket,sock ;
 void clientlist(clilist**thead,supcli* client ){
     clilist *p = (clilist *)malloc(sizeof(clilist));
+    if(p==NULL)
+        printf("err");
+        return;
+
     p->val = client;
-    p->next = (struct clilist*)*thead;
+    p->next = *thead;
     *thead = p;
 }
 void resend(int clisocket,char* buffer){
@@ -42,6 +46,7 @@ void resend(int clisocket,char* buffer){
         if(p->val->clisocket != clisocket){
             send(p->val->clisocket, buffer, sizeof(buffer), 0);
         }
+        p = p->next;
     }
 }
 DWORD WINAPI spcread(LPVOID thrd){
@@ -62,19 +67,21 @@ DWORD WINAPI spcaccept(LPVOID thrd){
     client->clisocket = accept(sock, (struct sockaddr *)&client->client_addres, &client->clientlenght);
 
     clientlist(&head, client);
-    strcpy(client->name ,"");
+    // strcpy(client->name ,"");
     // printf("[+] connect established from %s\n", inet_ntoa(client_address.sin_addr));
     // memset(client->name, 0, 1024);
     // // // letzero(buffer);
     // recv(sock, client->name, sizeof(client->name), 0);
     // printf("%s\n", buffer);
     HANDLE threade;
-    threade = CreateThread(NULL, 0, spcread, (LPVOID*)&client->clisocket, 0, NULL);
-    WaitForMultipleObjects(1, threade, TRUE, INFINITE);}
+    threade = CreateThread(NULL, 0, spcread, (LPVOID)&client->clisocket, 0, NULL);
+    WaitForSingleObject( threade,  INFINITE);
+    }
 }
 DWORD WINAPI  spcwrite(LPVOID thrd){
 while (1)
 {
+    clilist *p = head;
     char messa[1024];
     char buffer[1024];
     letzero(buffer);
@@ -83,7 +90,11 @@ while (1)
     sprintf(messa, "admin : %s", buffer);
     strtok(messa, "\n");
     //  printf("%s\n", messa);
-    send(client_socket, messa, sizeof(messa), 0);
+    while(p!=NULL){
+
+    send(p->val->clisocket, messa, sizeof(messa), 0);
+    p = p->next;
+    }
 }
 }
 
