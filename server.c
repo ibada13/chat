@@ -41,6 +41,7 @@ DWORD WINAPI spcaccept(LPVOID thrd){
     supcli *client = (supcli*)malloc(sizeof(supcli));
     client->clientlenght = sizeof(client->client_addres);
     client->clisocket = accept(sock, (struct sockaddr *)&client->client_addres, &client->clientlenght);
+
     clientlist(&head, client);
     strcpy(client->name ,"");
     // printf("[+] connect established from %s\n", inet_ntoa(client_address.sin_addr));
@@ -116,7 +117,7 @@ int main(){
 
     HANDLE theardsHa[2];
 
-    theardsHa[0] = CreateThread(NULL, 0, spcwrite, NULL, 0, NULL);
+    theardsHa[0] = CreateThread(NULL, NULL, spcwrite, NULL, 0, NULL);
     theardsHa[1] = CreateThread(NULL, 0, spcread, NULL, 0, NULL);
 
     if (theardsHa[0] == NULL || theardsHa[1] == NULL)
