@@ -38,7 +38,28 @@ DWORD WINAPI  spcread(LPVOID thread){
     printf("%s : ",name);
     }
 }
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    switch (uMsg) {
+        case WM_CLOSE:
+            // Handle the close message if needed
+            MessageBox(hwnd, "Close button clicked! Window will close.", "Close Message", MB_OK | MB_ICONINFORMATION);
+            DestroyWindow(hwnd);
+            return 0;
 
+        case WM_DESTROY:
+            // Handle the destroy message (window is being destroyed)
+            PostQuitMessage(0);
+            return 0;
+
+        default:
+            return DefWindowProc(hwnd, uMsg, wParam, lParam);
+    }
+}
+
+void MyFunction() {
+    // Your function logic goes here
+    MessageBox(NULL, "MyFunction called after window close.", "Function After Close", MB_OK | MB_ICONINFORMATION);
+}
 int main(){
      
     
@@ -85,4 +106,5 @@ int main(){
     closesocket(sock);
     WSACleanup();
     exit(0);
+    MyFunction();
 }
