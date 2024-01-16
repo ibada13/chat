@@ -24,14 +24,14 @@ while (1)
     fgets(buffer, sizeof(buffer), stdin);
     sprintf(messa, "%s : %s", name, buffer);
     strtok(messa, "\n");
-    printf("%s\n", messa);
+    // printf("%s\n", messa);
     send(sock, messa, sizeof(messa), 0);
 }
 
 }
 DWORD WINAPI  spcread(LPVOID thread){
     while(1){
-        char mes[1024];
+    char mes[1024];
     letzero(mes);
     recv(sock, mes, sizeof(mes), 0);
     printf("\r%s\n", mes);

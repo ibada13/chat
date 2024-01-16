@@ -1,1 +1,1 @@
-##chat using soket and muiltythreads
+##chat using soket and multithreads works with windows

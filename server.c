@@ -32,9 +32,12 @@ clilist *head = NULL;
 int client_socket,sock ;
 void clientlist(clilist**thead,supcli* client ){
     clilist *p = (clilist *)malloc(sizeof(clilist));
-    if(p==NULL)
+    if(p==NULL){
         printf("err");
-        return;
+    return;
+
+    }
+
 
     p->val = client;
     p->next = *thead;
@@ -44,11 +47,24 @@ void resend(int clisocket,char* buffer){
     clilist *p = head;
     while(p!=NULL){
         if(p->val->clisocket != clisocket){
-            send(p->val->clisocket, buffer, sizeof(buffer), 0);
+            send(p->val->clisocket, buffer, strlen(buffer), 0);
         }
         p = p->next;
     }
+    //printf("%s\n", buffer);
+    //printf("admin : ");
 }
+    void justsned(char* mes){
+     printf("%s\n", mes);
+
+        clilist *p = head;
+        while (p != NULL)
+        {
+
+            send(p->val->clisocket, mes, sizeof(mes), 0);
+            p = p->next;
+    }
+    }
 DWORD WINAPI spcread(LPVOID thrd){
     int client_socket = *((int *)thrd);
     while(1){
@@ -61,6 +77,7 @@ DWORD WINAPI spcread(LPVOID thrd){
     }
 }
 DWORD WINAPI spcaccept(LPVOID thrd){
+
    while(true){
     supcli *client = (supcli*)malloc(sizeof(supcli));
     client->clientlenght = sizeof(client->client_addres);
@@ -75,6 +92,10 @@ DWORD WINAPI spcaccept(LPVOID thrd){
     // printf("%s\n", buffer);
     HANDLE threade;
     threade = CreateThread(NULL, 0, spcread, (LPVOID)&client->clisocket, 0, NULL);
+        if (threade = NULL)
+    {
+        fprintf(stderr, "404 err hapend ... \n");
+    }
     WaitForSingleObject( threade,  INFINITE);
     }
 }
@@ -89,12 +110,7 @@ while (1)
     fgets(buffer, sizeof(buffer), stdin);
     sprintf(messa, "admin : %s", buffer);
     strtok(messa, "\n");
-    //  printf("%s\n", messa);
-    while(p!=NULL){
-
-    send(p->val->clisocket, messa, sizeof(messa), 0);
-    p = p->next;
-    }
+    justsned( messa);
 }
 }
 
