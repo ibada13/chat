@@ -47,7 +47,7 @@ void resend(int clisocket,char* buffer){
     clilist *p = head;
     while(p!=NULL){
         if(p->val->clisocket != clisocket){
-            send(p->val->clisocket, buffer, strlen(buffer), 0);
+            send(p->val->clisocket, buffer, strlen(buffer)+1, 0);
         }
         p = p->next;
     }
@@ -61,7 +61,7 @@ void resend(int clisocket,char* buffer){
         while (p != NULL)
         {
 
-            send(p->val->clisocket, mes, sizeof(mes), 0);
+            send(p->val->clisocket, mes, strlen(mes)+1, 0);
             p = p->next;
     }
     }
@@ -108,6 +108,7 @@ while (1)
     letzero(buffer);
     printf("admin : " );
     fgets(buffer, sizeof(buffer), stdin);
+    strtok(buffer, "\n");
     sprintf(messa, "admin : %s", buffer);
     strtok(messa, "\n");
     justsned( messa);
