@@ -18,6 +18,9 @@ typedef enum
     true
 }
 bool;
+void exitt(int clisocket){
+    
+}
 typedef struct{
     char name[1024];
     int clisocket;
@@ -78,6 +81,7 @@ DWORD WINAPI spcread(LPVOID thrd){
     printf("admin : ");
    } while (isStringeq(mes,"exit"));
 }
+
 DWORD WINAPI spcaccept(LPVOID thrd){
 
    while(true){

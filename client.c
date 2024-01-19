@@ -28,9 +28,10 @@ DWORD WINAPI  spcwrite(LPVOID thread){
     // printf("%s\n", messa);
     send(sock, messa, sizeof(messa), 0);
 } while (isStringeq(messa,"exit"));
+exit1 = 0;
 }
 DWORD WINAPI  spcread(LPVOID thread){
-    while(1){
+    while(exit){
     char mes[1024];
     letzero(mes);
     recv(sock, mes, sizeof(mes), 0);
