@@ -3,19 +3,20 @@
 #include <unistd.h>
 #include <winsock2.h>
 #include <windows.h>
-#include <winuser.h>
-#include <wininet.h>
-#include <windowsx.h>
+// #include <winuser.h>
+// #include <wininet.h>
+// #include <windowsx.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#define letzero(s) (void)memset(s, 0, sizeof(s));
 
+
+#include"lib/common.h"
+#define letzero(s) (void)memset(s, 0, sizeof(s));
+int exit1 = 1;
 int sock;
 char name[1024];
 char messa[1024];
 DWORD WINAPI  spcwrite(LPVOID thread){
-while (1)
+    do
 {
         char buffer[1024];
     letzero(buffer);
@@ -26,8 +27,7 @@ while (1)
     strtok(messa, "\n");
     // printf("%s\n", messa);
     send(sock, messa, sizeof(messa), 0);
-}
-
+} while (isStringeq(messa,"exit"));
 }
 DWORD WINAPI  spcread(LPVOID thread){
     while(1){
@@ -38,28 +38,9 @@ DWORD WINAPI  spcread(LPVOID thread){
     printf("%s : ",name);
     }
 }
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    switch (uMsg) {
-        case WM_CLOSE:
-            // Handle the close message if needed
-            MessageBox(hwnd, "Close button clicked! Window will close.", "Close Message", MB_OK | MB_ICONINFORMATION);
-            DestroyWindow(hwnd);
-            return 0;
 
-        case WM_DESTROY:
-            // Handle the destroy message (window is being destroyed)
-            PostQuitMessage(0);
-            return 0;
 
-        default:
-            return DefWindowProc(hwnd, uMsg, wParam, lParam);
-    }
-}
 
-void MyFunction() {
-    // Your function logic goes here
-    MessageBox(NULL, "MyFunction called after window close.", "Function After Close", MB_OK | MB_ICONINFORMATION);
-}
 int main(){
      
     
@@ -69,6 +50,14 @@ int main(){
     WSADATA wsaData;
     ServIP = "192.168.8.101";
     ServPort = 50005;
+    HWND hwnd = GetConsoleWindow();
+    HMENU hmenu = GetSystemMenu(hwnd, FALSE);
+    
+    // Disable close button
+    EnableMenuItem(hmenu, SC_CLOSE, MF_GRAYED);
+    
+    // Remove the close button from the system menu
+    RemoveMenu(hmenu, SC_CLOSE, MF_BYCOMMAND);
     if (WSAStartup(MAKEWORD(2, 0), &wsaData) != 0)
     {
         printf("[-] somtAZhing bad happend");
@@ -106,5 +95,5 @@ int main(){
     closesocket(sock);
     WSACleanup();
     exit(0);
-    MyFunction();
+   
 }

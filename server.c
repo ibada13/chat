@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -9,6 +10,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include"lib/common.h"
 typedef enum
 {
 
@@ -67,14 +69,14 @@ void resend(int clisocket,char* buffer){
     }
 DWORD WINAPI spcread(LPVOID thrd){
     int client_socket = *((int *)thrd);
-    while(1){
     char mes[1024];
+   do{
     letzero(mes);
     recv(client_socket, mes, sizeof(mes), 0);
     resend(client_socket, mes);
     printf("\r%s\n", mes);
     printf("admin : ");
-    }
+   } while (isStringeq(mes,"exit"));
 }
 DWORD WINAPI spcaccept(LPVOID thrd){
 
