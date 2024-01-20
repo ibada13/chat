@@ -29,12 +29,31 @@ typedef struct{
     bool err;
 }supcli;
 typedef struct clilist{
-    supcli *val;
+    supcli* val;
     struct clilist* next ;
 } clilist;
 clilist *head = NULL;
 #define letzero(s) (void)memset(s, 0, sizeof(s));
 int client_socket,sock ;
+void deleteclient(supcli* cli){
+    clilist* a = head->next ;
+    clilist* b = head ; 
+    if(b->val == cli ){
+        a = b;
+        b = b->next;
+        free(a);
+    }
+    else{
+
+    while(a->val != cli && a->next != NULL){
+        a = a->next;
+        b = b->next;
+    }
+    b->next = a->next ;
+    a->next = NULL;
+    free(a);
+    }
+}
 void clientlist(clilist**thead,supcli* client ){
     clilist *p = (clilist *)malloc(sizeof(clilist));
     if(p==NULL){
@@ -103,6 +122,8 @@ DWORD WINAPI spcaccept(LPVOID thrd){
         fprintf(stderr, "404 err hapend ... \n");
     }
     WaitForSingleObject( threade,  INFINITE);
+    close(client->clisocket);
+
     }
 }
 DWORD WINAPI  spcwrite(LPVOID thrd){
