@@ -27,11 +27,11 @@ DWORD WINAPI  spcwrite(LPVOID thread){
     strtok(messa, "\n");
     // printf("%s\n", messa);
     send(sock, messa, sizeof(messa), 0);
-} while (isStringeq(messa,"exit"));
+} while (!isStringeq(messa,"exit"));
 exit1 = 0;
 }
 DWORD WINAPI  spcread(LPVOID thread){
-    while(exit){
+    while(exit1){
     char mes[1024];
     letzero(mes);
     recv(sock, mes, sizeof(mes), 0);

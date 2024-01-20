@@ -127,8 +127,8 @@ DWORD WINAPI spcaccept(LPVOID thrd){
     }
 }
 DWORD WINAPI  spcwrite(LPVOID thrd){
-while (1)
-{
+do{
+
     clilist *p = head;
     char messa[1024];
     char buffer[1024];
@@ -139,7 +139,7 @@ while (1)
     sprintf(messa, "admin : %s", buffer);
     strtok(messa, "\n");
     justsned( messa);
-}
+} while (head);
 }
 
 int main(){
