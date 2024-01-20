@@ -31,13 +31,16 @@ DWORD WINAPI  spcwrite(LPVOID thread){
 exit1 = 0;
 }
 DWORD WINAPI  spcread(LPVOID thread){
-    while(exit1){
-    char mes[1024];
-    letzero(mes);
-    recv(sock, mes, sizeof(mes), 0);
-    printf("\r%s\n", mes);
-    printf("%s : ",name);
-    }
+        char mes[1024];
+    do{
+
+        printf("%d", exit1);
+        letzero(mes);
+        recv(sock, mes, sizeof(mes), 0);
+        printf("\r%s\n", mes);
+        printf("%s : ", name);
+
+    } while (isStringeq(mes, "ex"));
 }
 
 
@@ -79,9 +82,9 @@ int main(){
     fgets(name, sizeof(name), stdin);
     strtok(name, "\n");
     // letzero()
-    sprintf(first, "%s has enter the char", name);
+    // sprintf(first, "%s has enter the char", name);
     strtok(first, "\n");
-    send(sock, first, sizeof(first), 0);
+    send(sock, name, sizeof(name), 0);
 
     HANDLE theardsHa[2];
 
