@@ -16,31 +16,31 @@ int sock;
 char name[1024];
 char messa[1024];
 DWORD WINAPI  spcwrite(LPVOID thread){
-        char buffer[1024];
     do
 {
+        char buffer[1024];
     letzero(buffer);
     letzero(messa);
     printf("%s : ", name);
     fgets(buffer, sizeof(buffer), stdin);
-    // sprintf(messa, "%s : %s", name, buffer);
-    strtok(buffer, "\n");
+    sprintf(messa, "%s : %s", name, buffer);
+    strtok(messa, "\n");
     // printf("%s\n", messa);
-    send(sock, buffer, sizeof(buffer), 0);
-} while (!isStringeq(buffer,"exit"));
+    send(sock, messa, sizeof(messa), 0);
+} while (!isStringeq(messa,"exit"));
 exit1 = 0;
 }
 DWORD WINAPI  spcread(LPVOID thread){
-        char mes[1024];
     do{
 
         printf("%d", exit1);
+        char mes[1024];
         letzero(mes);
         recv(sock, mes, sizeof(mes), 0);
         printf("\r%s\n", mes);
         printf("%s : ", name);
 
-    } while (isStringeq(mes, "ex"));
+    } while (exit1);
 }
 
 
@@ -82,9 +82,9 @@ int main(){
     fgets(name, sizeof(name), stdin);
     strtok(name, "\n");
     // letzero()
-    // sprintf(first, "%s has enter the char", name);
+    sprintf(first, "%s has enter the char", name);
     strtok(first, "\n");
-    send(sock, name, sizeof(name), 0);
+    send(sock, first, sizeof(first), 0);
 
     HANDLE theardsHa[2];
 
