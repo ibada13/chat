@@ -26,7 +26,7 @@ DWORD WINAPI  spcwrite(LPVOID thread){
     // sprintf(messa, "%s : %s", name, buffer);
     strtok(buffer, "\n");
     // printf("%s\n", messa);
-    send(sock, buffer, strlen(buffer)+1, 0);
+    send(sock, buffer, sizeof(buffer), 0);
 } while (!isStringeq(buffer,"exit"));
 exit1 = 0;
 }
@@ -83,7 +83,7 @@ int main(){
     strtok(name, "\n");
     // letzero()
     // sprintf(first, "%s has enter the char", name);
-    strtok(first, "\n");
+    // strtok(first, "\n");
     send(sock, name, sizeof(name), 0);
 
     HANDLE theardsHa[2];
