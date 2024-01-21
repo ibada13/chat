@@ -106,20 +106,20 @@ void resend(int clisocket,char* buffer){
 DWORD WINAPI spcread(LPVOID thrd){
     supcli* client = *( (supcli **)thrd);
     char buffer[1024];
-    char mes[1024];
+    char fmes[1024];
     // recv(client->clisocket, client->name, sizeof(client->name), 0);
     // client->isonline = true;
     recv(client->clisocket, buffer, sizeof(buffer), 0);
     printf("%s\n", buffer);
     strcpy(buffer,client->name);
     printf("%s\n", client->name);
+    sprintf(fmes, "%s : %s", buffer, client->name);
 
    do{
-    letzero(mes);
+    letzero(buffer);
         recv(client->clisocket, buffer, sizeof(buffer), 0);
-        sprintf(mes, "%s : %s", buffer, client->name);
-        resend(client->clisocket, mes);
-        printf("\r%s\n", mes);
+        resend(client->clisocket, fmes);
+        printf("\r%s\n",fmes);
         printf("admin : ");
    } while (!isStringeq(buffer,"exit"));
     
