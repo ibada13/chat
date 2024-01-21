@@ -40,13 +40,15 @@ clilist *head = NULL;
 int client_socket,sock ;
 
 
-void deleteclient(supcli* cli){
-    clilist* a = head->next ;
-        clilist* b = head ; 
+void deleteclient(clilist** head, supcli* cli){
+    if(*head !=NULL){
+        
+    clilist* a = (*head)->next ;
+        clilist* b = *head ; 
     if(b->val == cli ){
-        a = b;
-            b = b->next;
-                free(a);
+        *head = (*head)->next;
+        b->next = NULL;
+        free(b);
     }
     else{
 
@@ -57,6 +59,7 @@ void deleteclient(supcli* cli){
     b->next = a->next ;
         a->next = NULL;
             free(a);
+    }
     }
 }
 void clientlist(clilist**thead,supcli* client ){
@@ -104,6 +107,11 @@ DWORD WINAPI spcread(LPVOID thrd){
     supcli* client = (supcli *)thrd;
     char buffer[1024];
     char mes[1024];
+    recv(client->clisocket, client->name, sizeof(client->name), 0);
+    // client->isonline = true;
+    // recv(client->clisocket, buffer, sizeof(buffer), 0);
+    // strcpy(buffer,client->name );
+    printf("%s\n", client->name);
 
    do{
     letzero(mes);
@@ -114,9 +122,9 @@ DWORD WINAPI spcread(LPVOID thrd){
         printf("admin : ");
    } while (!isStringeq(buffer,"exit"));
     
+
+
 }
-
-
 
 
 DWORD WINAPI spcaccept(LPVOID thrd){
@@ -125,22 +133,19 @@ DWORD WINAPI spcaccept(LPVOID thrd){
     supcli *client = (supcli*)malloc(sizeof(supcli));
         client->clientlenght = sizeof(client->client_addres);
             client->clisocket = accept(sock, (struct sockaddr *)&client->client_addres, &client->clientlenght);
-                // recv(client->clisocket, client->name, sizeof(client->name), 0);
-                // client->isonline = true;
-                // strcpy(recv(client->clisocket , ),client->name );
-                // printf("%s\n", client->name);
+
                 clientlist(&head, client);
 
                 HANDLE threade;
                 threade = CreateThread(NULL, 0, spcread, (LPVOID)&client, 0, NULL);
-                if (threade = NULL)
+                if (threade == NULL)
                 {
                     fprintf(stderr, "404 err hapend ... \n");
             }
-
-    WaitForSingleObject( threade,  INFINITE);
-        close(client->clisocket);
-
+            WaitForSingleObject(threade, INFINITE);
+            printf("vsfvdsd");
+            close(client->clisocket);
+            deleteclient(&head , client);
     }
 }
 
@@ -150,7 +155,7 @@ DWORD WINAPI spcaccept(LPVOID thrd){
 
 
 DWORD WINAPI  spcwrite(LPVOID thrd){
-do{
+while (1){
     clilist *p = head;
     char messa[1024];
     char buffer[1024];
@@ -162,7 +167,7 @@ do{
                     sprintf(messa, "admin : %s", buffer);
                         strtok(messa, "\n");
                             justsned( messa);
-} while (head!= NULL);
+} 
 }
 
 

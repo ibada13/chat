@@ -26,7 +26,7 @@ DWORD WINAPI  spcwrite(LPVOID thread){
     // sprintf(messa, "%s : %s", name, buffer);
     strtok(buffer, "\n");
     // printf("%s\n", messa);
-    send(sock, buffer, sizeof(buffer), 0);
+    send(sock, buffer, strlen(buffer)+1, 0);
 } while (!isStringeq(buffer,"exit"));
 exit1 = 0;
 }
