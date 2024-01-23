@@ -19,6 +19,7 @@
 //     true
 // }
 // bool;
+#define max_client 13
 void exitt(int clisocket){
     
 }
@@ -26,6 +27,7 @@ typedef struct{
     char name[1024];
     int clisocket;
     int clientlenght;
+    DWORD clithrID;
     struct sockaddr_in client_addres;
     boolean isonline ;
     boolean err;
@@ -35,6 +37,7 @@ typedef struct clilist{
     supcli* val;
     struct clilist* next ;
 } clilist;
+
 clilist *head = NULL;
 #define letzero(s) (void)memset(s, 0, sizeof(s));
 int client_socket,sock ;
@@ -131,24 +134,33 @@ DWORD WINAPI spcread(LPVOID thrd){
 
 
 DWORD WINAPI spcaccept(LPVOID thrd){
+                HANDLE threade[max_client];
+                int numclient = 0;
 
-   while(true){
-    supcli *client = (supcli*)malloc(sizeof(supcli));
-        client->clientlenght = sizeof(client->client_addres);
-            client->clisocket = accept(sock, (struct sockaddr *)&client->client_addres, &client->clientlenght);
-
-                clientlist(&head, client);
-
-                HANDLE threade;
-                threade = CreateThread(NULL, 0, spcread, (LPVOID)&client, 0, NULL);
-                if (threade == NULL)
+                while (true)
                 {
-                    fprintf(stderr, "404 err hapend ... \n");
-            }
-            WaitForSingleObject(threade, INFINITE);
-            
-            close(client->clisocket);
-            deleteclient(&head , client);
+                    supcli *client = (supcli *)malloc(sizeof(supcli));
+                    client->clientlenght = sizeof(client->client_addres);
+                    client->clisocket = accept(sock, (struct sockaddr *)&client->client_addres, &client->clientlenght);
+                    if(client->clisocket!= INVALID_SOCKET && numclient <= max_client){
+
+                    clientlist(&head, client);
+
+                    threade[numclient] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)spcread, (LPVOID)&client, 0, &(client->clithrID));
+                    if (threade[numclient] == NULL)
+                    {
+                        fprintf(stderr, "creating threade err hapend ... \n");
+                    }else{
+                        numclient++;
+                        printf("gsgsdv");
+                    }
+                    }
+                    else{
+                        fprintf(stderr, "max client is reached or broken socket !!!!!");
+                    }
+                    WaitForMultipleObjects(numclient, threade, TRUE, INFINITE);
+                         close(client->clisocket);
+                        deleteclient(&head, client);
     }
 }
 
