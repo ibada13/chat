@@ -40,7 +40,7 @@ DWORD WINAPI  spcread(LPVOID thread){
         printf("\r%s\n", mes);
         printf("%s : ", name);
 
-    } while (isStringeq(mes, "ex"));
+    } while (!isStringeq(mes, "ex"));
 }
 
 

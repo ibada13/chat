@@ -111,13 +111,15 @@ DWORD WINAPI spcread(LPVOID thrd){
     // client->isonline = true;
     recv(client->clisocket, buffer, sizeof(buffer), 0);
     printf("%s\n", buffer);
-    strcpy(buffer,client->name);
-    printf("%s\n", client->name);
-    sprintf(fmes, "%s : %s", buffer, client->name);
+    strcpy(client->name,buffer);
+    printf("%s has enter the chat\n", client->name);
+    printf("admin : ");
 
    do{
     letzero(buffer);
+
         recv(client->clisocket, buffer, sizeof(buffer), 0);
+        sprintf(fmes, "%s : %s", client->name,buffer);
         resend(client->clisocket, fmes);
         printf("\r%s\n",fmes);
         printf("admin : ");
@@ -144,7 +146,7 @@ DWORD WINAPI spcaccept(LPVOID thrd){
                     fprintf(stderr, "404 err hapend ... \n");
             }
             WaitForSingleObject(threade, INFINITE);
-            printf("vsfvdsd");
+            
             close(client->clisocket);
             deleteclient(&head , client);
     }
